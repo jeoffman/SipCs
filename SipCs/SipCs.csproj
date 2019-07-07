@@ -11,7 +11,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Its a work in progress DO NOT USE THIS</Description>
     <PackageReleaseNotes>WARNING: this thing is not ready for prime time!</PackageReleaseNotes>
-    <PackageIconUrl>https://raw.githubusercontent.com/jeoffman/jeoffman/SipCs/master/SipCs.Tests/Resources/Sip64x64.png?raw=true</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/jeoffman/SipCs/master/SipCs.Tests/Resources/Sip64x64.png?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/jeoffman/SipCs</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     
