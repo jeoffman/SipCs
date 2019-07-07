@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SipCs", "SipCs\SipCs.csproj", "{7ACFD772-A2D5-4637-9B7F-5E5E7632D28E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SipCs.Tests", "SipCs.Tests\SipCs.Tests.csproj", "{AA68A83C-766B-4630-B246-F506FCCAD5E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7ACFD772-A2D5-4637-9B7F-5E5E7632D28E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ACFD772-A2D5-4637-9B7F-5E5E7632D28E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ACFD772-A2D5-4637-9B7F-5E5E7632D28E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ACFD772-A2D5-4637-9B7F-5E5E7632D28E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA68A83C-766B-4630-B246-F506FCCAD5E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA68A83C-766B-4630-B246-F506FCCAD5E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA68A83C-766B-4630-B246-F506FCCAD5E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA68A83C-766B-4630-B246-F506FCCAD5E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1B489047-61EF-45EE-8628-8D53EE92F1BC}
+	EndGlobalSection
+EndGlobal
