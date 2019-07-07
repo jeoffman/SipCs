@@ -1,7 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+
+    <PackageId>SipCs</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Jeoffman</Authors>
+    <Company>Jeoffman</Company>
+    <PackageTags>SIP</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Its a work in progress DO NOT USE THIS</Description>
+    <PackageReleaseNotes>WARNING: this thing is not ready for prime time!</PackageReleaseNotes>
+    <PackageIconUrl>https://raw.githubusercontent.com/jeoffman/jeoffman/SipCs/master/SipCs.Tests/Resources/Sip64x64.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/jeoffman/SipCs</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
   </PropertyGroup>
 
 </Project>
