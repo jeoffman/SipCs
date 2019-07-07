@@ -1,8 +1,8 @@
 using Moq;
+using SipCs.Headers;
 using SipCs.Tests.SampleSipMessages;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Text;
 using Xunit;
 
@@ -61,6 +61,8 @@ a=rtpmap:31 LPC
       newvalue ;
   secondparam ; q = 0.33", parser.Headers["m"].First());
 
+            Assert.Equal(2, parser.ViaHeaders.Count());
+
             Assert.Equal(expectedBody, parser.Body);  //TODO: drill in
         }
 
@@ -74,12 +76,10 @@ a=rtpmap:31 LPC
 
             parser.ParseRequest(messageBytes);
             Assert.Throws<KeyNotFoundException>(() => parser.Headers["Header Which Is Not There"]);   //TODO: maybe some other kind of exception? or a NULL return value?
-
-            //ViaHeaderValue val = new ViaHeaderValue("", "");
         }
 
         [Fact]
-        public void UnderstandCopactHeadersTest()
+        public void UnderstandCompactHeadersTest()
         {
             var mock = new Mock<ISipParserHandler>();
             SipParser parser = new SipParser(mock.Object);
@@ -99,12 +99,15 @@ a=rtpmap:31 LPC
             Assert.Equal(@"replaces", parser.Headers["k"].First());  //NOTE: "k" is "supported"
             Assert.Equal(@"application/sdp", parser.Headers["c"].First());  //NOTE: "c" is "Content-Type"
             Assert.Equal(@"258", parser.Headers["l"].First());  //NOTE: "l" is "Content-Length"
+
+            Assert.Single(parser.ViaHeaders);
+
             //Assert.Equal(@"xxxxxxxx", parser.Headers["o"].First());  //NOTE: "o" is "Event"
             //Assert.Equal(@"xxxxxxxx", parser.Headers["e"].First());  //NOTE: "e" is "Content-Encoding"
-//CSeq: 102 INVITE
-//User-Agent: Asterisk PBX
-//Max-Forwards: 70
-//Date: Wed, 06 Dec 2009 14:12:45 GMT
+            //CSeq: 102 INVITE
+            //User-Agent: Asterisk PBX
+            //Max-Forwards: 70
+            //Date: Wed, 06 Dec 2009 14:12:45 GMT
         }
     }
 }

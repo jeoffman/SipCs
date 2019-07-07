@@ -15,30 +15,20 @@ namespace SipCs.Headers
 
         internal bool ContainsKey(string headerName)
         {
-            return Headers.ContainsKey(LookupComapactHeader(headerName));
+            return Headers.ContainsKey(HeaderHelpers.LookupComapactHeader(headerName));
         }
 
         public List<string> this[string headerName]
         {
             get
             {
-                return Headers[LookupComapactHeader(headerName)];
+                return Headers[HeaderHelpers.LookupComapactHeader(headerName)];
             }
 
             set
             {
-                Headers[LookupComapactHeader(headerName)] = value;
+                Headers[HeaderHelpers.LookupComapactHeader(headerName)] = value;
             }
-        }
-
-        public string LookupComapactHeader(string possibleCompactHeader)
-        {
-            string retval;
-            if (HeaderHelpers.CompactHeaders.ContainsKey(possibleCompactHeader))
-                retval = HeaderHelpers.CompactHeaders[possibleCompactHeader];
-            else
-                retval = possibleCompactHeader; //probably not a compact header, I hope you know what you are doing
-            return retval;
         }
     }
 }

@@ -15,9 +15,14 @@ namespace SipCs
         public string RequestLine { get; set; }
         public string Body { get; set; }
         public BaseHeaderDictionary Headers { get; set; } = new BaseHeaderDictionary();
-        
+        public List<ViaSipHeaderValue> ViaHeaders { get; private set; } = new List<ViaSipHeaderValue>();
 
         private ISipParserHandler _handler;
+
+        public SipParser()
+        {
+            _handler = null;
+        }
 
         public SipParser(ISipParserHandler handler)
         {
@@ -55,7 +60,7 @@ namespace SipCs
                     }
                     else if (foundPosition > 0)
                     {
-                        scanPosition = ExtracNextHeader(requestBytes, scanPosition);
+                        scanPosition = ExtractNextHeader(requestBytes, scanPosition);
                     }
                     else
                     {
@@ -72,7 +77,7 @@ namespace SipCs
         /// <param name="requestBytes"></param>
         /// <param name="scanPosition"></param>
         /// <returns></returns>
-        private int ExtracNextHeader(byte[] requestBytes, int scanPosition)
+        private int ExtractNextHeader(byte[] requestBytes, int scanPosition)
         {
             int foundPosition;
             //found a header, now what?
@@ -91,9 +96,7 @@ namespace SipCs
                     indexOfColon++; //skip the colon while we get the value
                     string headerValue = entireHeaderText.Substring(indexOfColon, entireHeaderText.Length - indexOfColon).Trim();
 
-                    if (!Headers.ContainsKey(headerName))
-                        Headers[headerName] = new List<string>();
-                    Headers[headerName].Add(headerValue);
+                    ProcessHeader(headerName, headerValue);
                 }
                 else
                 {
@@ -102,6 +105,20 @@ namespace SipCs
             }
             scanPosition = seekHeaderStopPosition + ByteCRLR.Length;
             return scanPosition;
+        }
+
+        private void ProcessHeader(string headerName, string headerValue)
+        {
+            //Save the "RAW" header value text
+            if (!Headers.ContainsKey(headerName))
+                Headers[headerName] = new List<string>();
+            Headers[headerName].Add(headerValue);
+
+            if (HeaderHelpers.LookupComapactHeader(headerName).Equals("Via"))
+            {
+                ViaSipHeaderValue viaHeaderValue = ViaSipHeaderValue.ParseViaHeaderValue(headerValue);
+                ViaHeaders.Add(viaHeaderValue);
+            }
         }
 
         /// <summary>Seeks through byte array to find the end of your current header</summary>
