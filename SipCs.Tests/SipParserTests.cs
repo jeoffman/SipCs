@@ -79,7 +79,7 @@ a=rtpmap:31 LPC
         }
 
         [Fact]
-        public void UnderstandCopactHeadersTest()
+        public void UnderstandCompactHeadersTest()
         {
             var mock = new Mock<ISipParserHandler>();
             SipParser parser = new SipParser(mock.Object);
