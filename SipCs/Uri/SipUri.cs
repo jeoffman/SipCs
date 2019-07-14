@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace SipCs.Uri
@@ -11,7 +12,6 @@ namespace SipCs.Uri
         public string Password { get; set; }
         public string Domain { get; set; }
         public int Port { get; set; }
-
         public List<UriParameter> UriParameters { get; set; } = new List<UriParameter>();
 
         public SipUri(string uriText)
@@ -23,15 +23,19 @@ namespace SipCs.Uri
         {
             //couldn't get the other ones to work so I fumbled into this one
             // try    https://regex101.com/   for playing around
-            string regexSipUriText = @"(?:"")?([^<""]*)(?:"")?[ ]*(?:<)?(sip(?:s)?|tel):([^@]+)@([^> ;]+)(?:>)?(?:[ ;])?(?:[;])?(.*)";
+            string regexSipUriText = @"(?:"")?([^<""]*)(?:"")?[ ]*(?:<)?(sip(?:s)?|tel):(([^@]+)@)?([^> ;]+)(?:>)?(?:[ ;])?(?:[;])?(.*)";
+            //TODO: this regex is very permissive and will allow illegal SIP URIs - see the tests, especially the "skip" ones and the commented-out theory ones
 
             Regex sipTry = new Regex(regexSipUriText);
             var matches = sipTry.Match(uriText);
+            if (!matches.Success)
+                throw new InvalidOperationException($"{nameof(SipUri)} {nameof(Parse)} invalid URI \"{uriText}\"");
 
             Contact = matches.Groups[1].Value.Trim();
             Scheme = matches.Groups[2].Value;
 
-            var usernamePassword = matches.Groups[3].Value;
+            //HACK: Group 3 is the username with that @ symbol at the end - a result of changes to make User:password optional (like a REGISTER)
+            var usernamePassword = matches.Groups[4].Value;
             var indexOfColon = usernamePassword.IndexOf(':');
             if (indexOfColon > 0)
             {
@@ -43,7 +47,7 @@ namespace SipCs.Uri
                 UserName = usernamePassword;
             }
 
-            var domainAndPort = matches.Groups[4].Value;
+            var domainAndPort = matches.Groups[5].Value;
             string regexIpv6Text = @"(\[.*\])(?::)?([0-9]*)?";
             Regex ipv6Try = new Regex(regexIpv6Text);
             var matchIpv6 = ipv6Try.Match(domainAndPort);
@@ -59,7 +63,11 @@ namespace SipCs.Uri
                 if (indexOfColon > 0)
                 {
                     Domain = domainAndPort.Substring(0, indexOfColon);
-                    Port = int.Parse(domainAndPort.Substring(indexOfColon + 1));
+                    var portText = domainAndPort.Substring(indexOfColon + 1);
+                    int portNumber;
+                    if (!int.TryParse(portText, out portNumber))
+                        throw new InvalidOperationException($"{nameof(SipUri)} {nameof(Parse)} invalid port {portText} in \"{uriText}\"");
+                    Port = portNumber;
                 }
                 else
                 {
@@ -67,7 +75,7 @@ namespace SipCs.Uri
                 }
             }
 
-            var tags = matches.Groups[5].Value;
+            var tags = matches.Groups[6].Value;
             var splitParameters = tags.Split(';');
             foreach (var parameter in splitParameters)
             {
