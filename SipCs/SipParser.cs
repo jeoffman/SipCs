@@ -1,4 +1,5 @@
 ﻿using SipCs.Headers;
+using SipCs.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,12 @@ namespace SipCs
         private static readonly byte[] ByteCRLR = { (byte)'\r', (byte)'\n' };
 
         public string RequestLine { get; set; }
-        public string Body { get; set; }
+        public SipRequest SipRequest { get; set; }
+
         public BaseHeaderDictionary Headers { get; set; } = new BaseHeaderDictionary();
         public List<ViaSipHeaderValue> ViaHeaders { get; private set; } = new List<ViaSipHeaderValue>();
+
+        public string Body { get; set; }
 
         private ISipParserHandler _handler;
 
@@ -30,7 +34,7 @@ namespace SipCs
         }
 
         /// <summary>Request line, optional headers, empty line, optional message body</summary>
-        /// <param name="requestText">Complete request</param>
+        /// <param name="requestBytes">Complete request</param>
         /// <returns>sure</returns>
         public bool ParseRequest(byte[] requestBytes)
         {
@@ -42,7 +46,8 @@ namespace SipCs
             if (foundPosition > 10) //minimum request line is like 12 bytes or something
             {
                 //copy first (request) line for now and move on
-                RequestLine = System.Text.Encoding.UTF8.GetString(requestBytes, 0, foundPosition);
+                RequestLine = Encoding.UTF8.GetString(requestBytes, 0, foundPosition);
+                SipRequest = new SipRequest(RequestLine);
                 if (_handler != null)
                     _handler.OnRequestLine(RequestLine);
                 scanPosition = foundPosition + ByteCRLR.Length;
@@ -54,7 +59,7 @@ namespace SipCs
                     if (foundPosition == scanPosition)
                     {   //we must have found the body = copy and we're done
                         foundPosition += ByteCRLR.Length;
-                        Body = System.Text.Encoding.UTF8.GetString(requestBytes, foundPosition, requestBytes.Length - foundPosition);
+                        Body = Encoding.UTF8.GetString(requestBytes, foundPosition, requestBytes.Length - foundPosition);
                         keepScanningHeaders = false;
                         break;
                     }
