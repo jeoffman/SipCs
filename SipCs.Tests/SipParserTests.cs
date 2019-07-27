@@ -1,6 +1,7 @@
 using Moq;
 using SipCs.Headers;
 using SipCs.Tests.SampleSipMessages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -108,6 +109,67 @@ a=rtpmap:31 LPC
             //User-Agent: Asterisk PBX
             //Max-Forwards: 70
             //Date: Wed, 06 Dec 2009 14:12:45 GMT
+        }
+
+        [Fact]
+        public void ParseBytesForSIPMessageShouldReturnTrueWhenGivenACompleteMessage()
+        {
+            var mock = new Mock<ISipParserHandler>();
+            SipParser parser = new SipParser(mock.Object);
+
+            byte[] messageBytes = Encoding.ASCII.GetBytes(Rfc4475TestMessages.AShortTortuousINVITE);
+
+            bool wasMessageComplete = parser.ParseRequest(messageBytes);
+
+            Assert.True(wasMessageComplete);
+        }
+
+        [Fact]
+        public void ParseBytesForSIPMessageShouldReturnFalseWhenHeaderEndBytesAreMissing()
+        {
+            var mock = new Mock<ISipParserHandler>();
+            SipParser parser = new SipParser(mock.Object);
+
+            byte[] messageBytes = Encoding.ASCII.GetBytes(Rfc4475TestMessages.AShortTortuousINVITE);
+
+            //850 is the final LF
+
+            byte[] messageBytesWithoutHeaderEndBytes = new byte[847];
+
+            Array.Copy(messageBytes, 0, messageBytesWithoutHeaderEndBytes, 0, messageBytesWithoutHeaderEndBytes.Length);
+
+            bool wasMessageComplete = parser.ParseRequest(messageBytesWithoutHeaderEndBytes);
+
+            //Result should be false since we don't have all the header bytes (missing CLRF CLRF)
+            Assert.False(wasMessageComplete);
+        }
+
+        [Fact]
+        public void ParseBytesForSIPMessageShouldReturnTrueForEmptyBody()
+        {
+            var mock = new Mock<ISipParserHandler>();
+            SipParser parser = new SipParser(mock.Object);
+
+            byte[] messageBytes = Encoding.ASCII.GetBytes(Rfc4475TestMessages.AnINVITEWithNoBody);
+
+            bool wasMessageComplete = parser.ParseRequest(messageBytes);
+
+            //Result should be false since we don't have all the header bytes (missing CLRF CLRF)
+            Assert.True(wasMessageComplete);
+        }
+
+        [Fact]
+        public void ParseBytesForSIPMessageShouldReturnFalseForIncompleteBody()
+        {
+            var mock = new Mock<ISipParserHandler>();
+            SipParser parser = new SipParser(mock.Object);
+
+            byte[] messageBytes = Encoding.ASCII.GetBytes(Rfc4475TestMessages.AnINVITEWithIncompleteBody);
+
+            bool wasMessageComplete = parser.ParseRequest(messageBytes);
+
+            //Result should be false since we don't have all the header bytes (missing CLRF CLRF)
+            Assert.False(wasMessageComplete);
         }
     }
 }

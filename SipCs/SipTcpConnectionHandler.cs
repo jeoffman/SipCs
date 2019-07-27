@@ -10,10 +10,12 @@ namespace SipCs
     public class SipTcpConnectionHandler : ConnectionHandler
     {
         private readonly ILogger<SipTcpConnectionHandler> logger;
+        private readonly SipParser sipParser;
 
-        public SipTcpConnectionHandler(ILogger<SipTcpConnectionHandler> logger)
+        public SipTcpConnectionHandler(ILogger<SipTcpConnectionHandler> logger, SipParser sipParser)
         {
             this.logger = logger;
+            this.sipParser = sipParser;
         }
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
@@ -24,6 +26,10 @@ namespace SipCs
             {
                 var result = await connection.Transport.Input.ReadAsync();
                 var buffer = result.Buffer;
+
+                //sipParser.ParseRequest(buffer);
+
+
             }
         }
     }

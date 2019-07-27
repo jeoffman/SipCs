@@ -12,6 +12,7 @@ namespace SipCs
         private const byte ByteCR = (byte)'\r';
         private const byte ByteLF = (byte)'\n';
         private static readonly byte[] ByteCRLR = { (byte)'\r', (byte)'\n' };
+        private static readonly byte[] ByteCRLRCRLR = { (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' };
 
         public string RequestLine { get; set; }
         public SipRequest SipRequest { get; set; }
@@ -33,7 +34,11 @@ namespace SipCs
             _handler = handler;
         }
 
-        /// <summary>Request line, optional headers, empty line, optional message body</summary>
+        /// <summary>
+        /// Request line, optional headers, empty line, optional message body.
+        /// Returns true if bytes were a complete SIP message and headers were
+        /// parsed.  Returns false if passed in bytes are NOT a complete SIP message.
+        /// </summary>
         /// <param name="requestBytes">Complete request</param>
         /// <returns>sure</returns>
         public bool ParseRequest(byte[] requestBytes)
@@ -41,41 +46,66 @@ namespace SipCs
             bool keepScanningHeaders = true;
             int scanPosition = 0;
 
-            //Request Line
-            int foundPosition = IndexOfSequence(requestBytes, ByteCRLR, scanPosition);
-            if (foundPosition > 10) //minimum request line is like 12 bytes or something
-            {
-                //copy first (request) line for now and move on
-                RequestLine = Encoding.UTF8.GetString(requestBytes, 0, foundPosition);
-                SipRequest = new SipRequest(RequestLine);
-                if (_handler != null)
-                    _handler.OnRequestLine(RequestLine);
-                scanPosition = foundPosition + ByteCRLR.Length;
+            bool isSipMessageComplete = false;
 
-                //find and extract all headers
-                while (keepScanningHeaders)
+            int indexOfHeaderEndSequence = IndexOfSequence(requestBytes, ByteCRLRCRLR, 0);
+
+            if (indexOfHeaderEndSequence > 0)
+            {
+                //Request Line
+                int foundPosition = IndexOfSequence(requestBytes, ByteCRLR, scanPosition);
+                if (foundPosition > 10) //minimum request line is like 12 bytes or something
                 {
-                    foundPosition = IndexOfSequence(requestBytes, ByteCRLR, scanPosition);
-                    if (foundPosition == scanPosition)
-                    {   //we must have found the body = copy and we're done
-                        foundPosition += ByteCRLR.Length;
-                        Body = Encoding.UTF8.GetString(requestBytes, foundPosition, requestBytes.Length - foundPosition);
-                        keepScanningHeaders = false;
-                        break;
-                    }
-                    else if (foundPosition > 0)
+                    //copy first (request) line for now and move on
+                    RequestLine = Encoding.UTF8.GetString(requestBytes, 0, foundPosition);
+                    SipRequest = new SipRequest(RequestLine);
+                    if (_handler != null)
+                        _handler.OnRequestLine(RequestLine);
+                    scanPosition = foundPosition + ByteCRLR.Length;
+
+                    //find and extract all headers
+                    while (keepScanningHeaders)
                     {
-                        scanPosition = ExtractNextHeader(requestBytes, scanPosition);
-                    }
-                    else
-                    {
-                        keepScanningHeaders = false;
-                        break;
+                        foundPosition = IndexOfSequence(requestBytes, ByteCRLR, scanPosition);
+                        if (foundPosition == scanPosition)
+                        {
+                            //This is the case where we have received the CRLF/CRLF
+                            //we must have found the body = copy and we're done
+                            foundPosition += ByteCRLR.Length;
+
+                            int contentLength = GetContentLength();
+
+                            if(requestBytes.Length - foundPosition == contentLength)
+                            {
+                                //we have the whole body, so let's parse it!
+                                Body = Encoding.UTF8.GetString(requestBytes, foundPosition, requestBytes.Length - foundPosition);
+                                //The sip message is now complete, so let's let the caller know...
+                                isSipMessageComplete = true;
+                            }
+
+                            //We either have the complete body parsed, or we don't
+                            //either way we're done!
+                            keepScanningHeaders = false;
+                        }
+                        else if (foundPosition > 0)
+                        {
+                            //we have a single CRLF, so that means we have one header to extract
+                            scanPosition = ExtractNextHeader(requestBytes, scanPosition);
+
+                            //but we haven't received CRLF/CRLF yet so let's tell caller that the SIP
+                            //message isn't complete
+                        }
+                        else
+                        {
+                            //We have not found a CRLF, let's stop scanning headers but also tell caller
+                            //that this is not a complete SIP Message
+                            keepScanningHeaders = false;
+                        }
                     }
                 }
-
             }
-            return false;
+
+            return isSipMessageComplete;
         }
 
         /// <summary>Read entire header, i.e. name and value(s), from byte array and add it to the Headers property</summary>
@@ -171,6 +201,30 @@ namespace SipCs
                 i = Array.IndexOf<byte>(buffer, pattern[0], i + 1);
             }
             return positions;
+        }
+
+        private int GetContentLength()
+        {
+            if (Headers.Headers.TryGetValue("content-length", out var lengthHeaderValues))
+            {
+                if (lengthHeaderValues.Count > 1)
+                    throw new ArgumentException($"Sip message has multiple content-length values!");
+
+                string contentLengthValueString = lengthHeaderValues.Single();
+
+                if (int.TryParse(contentLengthValueString, out var contentLength))
+                {
+                    return contentLength;
+                }
+                else
+                {
+                    throw new ArgumentException($"Content length is not a number!");
+                }
+            }
+            else
+            {
+                throw new ArgumentException($"Sip message is missing content-length!");
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SipCs.Tests.SampleSipMessages;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -51,13 +52,13 @@ namespace SipCs.Tests
             //open a TCP connection to it
             TcpClient tcpClient = new TcpClient();
 
-            byte[] someBytes = new byte[] { 0x01, 0x0c };
+            byte[] messageBytes = Encoding.ASCII.GetBytes(Rfc4475TestMessages.AShortTortuousINVITE);
 
             await tcpClient.ConnectAsync(IPAddress.Loopback, 8007);
 
             var stream = tcpClient.GetStream();
 
-            await stream.WriteAsync(someBytes, 0, someBytes.Length);
+            await stream.WriteAsync(messageBytes, 0, messageBytes.Length);
             //Make sure we parsed sip stuff somehow?
 
             byte[] responseBuffer = new byte[1024];
@@ -77,6 +78,8 @@ namespace SipCs.Tests
                 {
                     options.AddConsole();
                 });
+
+                services.AddSingleton(new SipParser());
             }
 
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
