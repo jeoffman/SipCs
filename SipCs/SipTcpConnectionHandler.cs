@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,9 +9,22 @@ namespace SipCs
 {
     public class SipTcpConnectionHandler : ConnectionHandler
     {
-        public override Task OnConnectedAsync(ConnectionContext connection)
+        private readonly ILogger<SipTcpConnectionHandler> logger;
+
+        public SipTcpConnectionHandler(ILogger<SipTcpConnectionHandler> logger)
         {
-            throw new NotImplementedException();
+            this.logger = logger;
+        }
+
+        public override async Task OnConnectedAsync(ConnectionContext connection)
+        {
+            logger.LogDebug($"Received connection: {connection.ConnectionId}");
+
+            while(true)
+            {
+                var result = await connection.Transport.Input.ReadAsync();
+                var buffer = result.Buffer;
+            }
         }
     }
 }
