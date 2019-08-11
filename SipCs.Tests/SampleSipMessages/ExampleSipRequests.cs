@@ -1,6 +1,6 @@
 ﻿namespace SipCs.Tests.SampleSipMessages
 {
-    public class ExampleSipMessages
+    public class ExampleSipRequests
     {
         public const string SimpleInvite = @"INVITE sip:13@10.10.1.13 SIP/2.0
 Via: SIP/2.0/UDP 10.10.1.99:5060;branch=z9hG4bK343bf628;rport
@@ -30,5 +30,9 @@ a=fmtp:101 0-16
 a=silenceSupp:off - - - -
 a=ptime:20
 a=sendrecv";
-        }
+    }
+
+    //from:   https://stackoverflow.com/questions/1632499/problem-with-sip-bye-message
+
+
 }
