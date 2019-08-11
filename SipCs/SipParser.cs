@@ -162,7 +162,7 @@ namespace SipCs
             while (i >= 0 && i <= buffer.Length - pattern.Length)
             {
                 byte[] segment = new byte[pattern.Length];
-                Buffer.BlockCopy(buffer, i, segment, 0, pattern.Length);
+                System.Buffer.BlockCopy(buffer, i, segment, 0, pattern.Length);
                 if (segment.SequenceEqual<byte>(pattern))
                 {
                     positions = i;

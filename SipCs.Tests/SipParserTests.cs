@@ -72,7 +72,7 @@ a=rtpmap:31 LPC
             var mock = new Mock<ISipParserHandler>();
             SipParser parser = new SipParser(mock.Object);
 
-            byte[] messageBytes = Encoding.ASCII.GetBytes(ExampleSipMessages.SimpleInvite);
+            byte[] messageBytes = Encoding.ASCII.GetBytes(ExampleSipRequests.SimpleInvite);
 
             parser.ParseRequest(messageBytes);
             Assert.Throws<KeyNotFoundException>(() => parser.Headers["Header Which Is Not There"]);   //TODO: maybe some other kind of exception? or a NULL return value?
@@ -84,7 +84,7 @@ a=rtpmap:31 LPC
             var mock = new Mock<ISipParserHandler>();
             SipParser parser = new SipParser(mock.Object);
 
-            byte[] messageBytes = Encoding.ASCII.GetBytes(ExampleSipMessages.SimpleInvite);
+            byte[] messageBytes = Encoding.ASCII.GetBytes(ExampleSipRequests.SimpleInvite);
 
             parser.ParseRequest(messageBytes);
 
