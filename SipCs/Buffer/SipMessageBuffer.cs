@@ -54,7 +54,6 @@ namespace SipCs.Buffer
                 if (position != -1)
                 {   // we found content length so try to get the length of the BODY from this message
                     position += contentLengthBytes.Length;
-
                 }
                 else if (position == -1)
                 {   //try searching for "Compact Header" l:

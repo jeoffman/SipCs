@@ -209,7 +209,6 @@ namespace SipCs.Tests
             Assert.Equal(messageBytes, ret);
         }
 
-        
         [Fact]
         public void HandleCaseInsensitiveContentLength()
         {
@@ -220,6 +219,5 @@ namespace SipCs.Tests
             var ret = buffer.GetCompletedMessage();
             Assert.Equal(messageBytes, ret);
         }
-
     }
 }
