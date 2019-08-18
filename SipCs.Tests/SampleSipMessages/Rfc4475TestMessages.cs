@@ -133,7 +133,9 @@ CSeq: 14398234 REGISTER
 Via: SIP/2.0/UDP host5.example.com;branch=z9hG4bKkdjuw
 Contact: <sip:%00@host5.example.com>
 Contact: <sip:%00%00@host5.example.com>
-L:0";
+L:0
+
+";
 
         /// <summary>
         /// RFC 4475, 3.1.1.7.  Long Values in Header Fields
@@ -191,7 +193,8 @@ c=IN IP4 192.0.2.1
 t=0 0
 m=audio 49217 RTP/AVP 0 12
 m=video 3227 RTP/AVP 31
-a=rtpmap:31 LPC";
+a=rtpmap:31 LPC
+";
 
         /// <summary>
         /// RFC 4475, 3.1.1.6.  Message with No LWS between Display Name and <
@@ -204,7 +207,9 @@ Max-Forwards: 70
 Call-ID: lwsdisp.1234abcd@funky.example.com
 CSeq: 60 OPTIONS
 Via: SIP/2.0/UDP funky.example.com;branch=z9hG4bKkdjuw
-l: 0";
+l: 0
+
+";
 
         /// <summary>
         /// 3.1.1.9.  Semicolon-Separated Parameters in URI User Part
@@ -230,6 +235,7 @@ Accept: application/sdp, application/pkcs7-mime,
       message/sip, message/sipfrag
 Via: SIP/2.0/UDP 192.0.2.1;branch=z9hG4bKkdjuw
 l: 0
+
 ";
 
         /// <summary>
@@ -246,20 +252,22 @@ Max-Forwards: 70
 Contact: <sip:alias1@host1.example.com>
 C%6Fntact: <sip:alias2@host2.example.com>
 Contact: <sip:alias3@host3.example.com>
-l: 0";
+l: 0
+
+";
 
         /// <summary>
         /// RFC 4475, 3.1.1.2.  Wide Range of Valid Characters
         /// </summary>
         public const string ValidCharacters =
             "!interesting-Method0123456789_*+`.%indeed'~ sip:1_unusual.URI~(to-be!sure)&isn't+it$/crazy?,/;;*:&it+has=1,weird!*pas$wo~d_too.(doesn't-it)@example.com SIP/2.0\r\n" +
-            "Via: SIP/2.0/TCP host1.example.com;branch=z9hG4bK-.!%66*_+`'~" +
-            "To: \"BEL:\x07 NUL:\x00 DEL:\x7F\"<sip:1_unusual.URI~(to-be!sure)&isn't+it$/crazy?,/;;*@example.com>" +
-            "From: token1~` token2'+_ token3*%!.- <sip:mundane@example.com>;fromParam''~+*_!.-%=\"\xD1\x80\xD0\xB0\xD0\xB1\xD0\xBE\xD1\x82\xD0\xB0\xD1\x8E\xD1\x89\xD0\xB8\xD0\xB9\";tag=_token~1'+`*%!-." +
-            "Call-ID: intmeth.word%ZK-!.*_+'@word`~)(><:\\/\"][?}{" +
-            "CSeq: 139122385 !interesting-Method0123456789_*+`.%indeed'~" +
-            "Max-Forwards: 255" +
-            "extensionHeader-!.%*+_`'~:\xEF\xBB\xBF\xE5\xA4\xA7\xE5\x81\x9C\xE9\x9B\xBB" +
-            "Content-Length: 0";
+            "Via: SIP/2.0/TCP host1.example.com;branch=z9hG4bK-.!%66*_+`'~\r\n" +
+            "To: \"BEL:\x07 NUL:\x00 DEL:\x7F\"<sip:1_unusual.URI~(to-be!sure)&isn't+it$/crazy?,/;;*@example.com>\r\n" +
+            "From: token1~` token2'+_ token3*%!.- <sip:mundane@example.com>;fromParam''~+*_!.-%=\"\xD1\x80\xD0\xB0\xD0\xB1\xD0\xBE\xD1\x82\xD0\xB0\xD1\x8E\xD1\x89\xD0\xB8\xD0\xB9\";tag=_token~1'+`*%!-.\r\n" +
+            "Call-ID: intmeth.word%ZK-!.*_+'@word`~)(><:\\/\"][?}{\r\n" +
+            "CSeq: 139122385 !interesting-Method0123456789_*+`.%indeed'~\r\n" +
+            "Max-Forwards: 255\r\n" +
+            "extensionHeader-!.%*+_`'~:\xEF\xBB\xBF\xE5\xA4\xA7\xE5\x81\x9C\xE9\x9B\xBB\r\n" +
+            "Content-Length: 0\r\n\r\n";
     }
 }

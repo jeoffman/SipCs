@@ -47,13 +47,64 @@ namespace SipCs.Buffer
 
             if(_contentLength == null)
             {
-                byte[] contentLengthBytes = Encoding.UTF8.GetBytes("Content-Length:");
+                byte[] contentLengthBytes = Encoding.UTF8.GetBytes("\nContent-Length");
 
                 //scan for Content-Length and math plus BODY, or missing Content-Length and at least BODY
                 int position = SimpleBoyerMooreSearch(_buffer, contentLengthBytes);
                 if (position != -1)
                 {   // we found content length so try to get the length of the BODY from this message
                     position += contentLengthBytes.Length;
+                }
+                else if (position == -1)
+                {   //try searching for "Compact Header" l:
+                    bool compactHeaderFound = false;
+                    position = 0;
+                    while (position < _currentPosition)  //don't go past the head
+                    {
+                        if (_buffer[position] == (byte)'l' || _buffer[position] == (byte)'L')   //case insensitive compact header l:
+                        {// skip white space and look for : (good) or CRLF (bad)
+                            position++; //skip the l
+                            while (position < _currentPosition)  //don't go past the head
+                            {
+                                if (_buffer[position] == (byte)' ' || _buffer[position] == (byte)'\t')
+                                {
+                                    //skip white space and keep scanning
+                                }
+                                else if (_buffer[position] == (byte)':')
+                                {
+                                    compactHeaderFound = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    compactHeaderFound = false;
+                                    break;
+                                }
+                                position++;
+                            }
+                            if (compactHeaderFound)
+                                break;
+                        }
+                        position++;
+                    }
+                    if (!compactHeaderFound)
+                        position = -1;  //I smell a HACK here!
+                }
+
+                if (position != -1)
+                {   // we found content length so try to get the length of the BODY from this message
+                    //seek the :
+                    while (position < _currentPosition)  //don't go past the head
+                    {
+                        if (_buffer[position] == (byte)':')
+                        {
+                            position++;
+                            break;
+                        }
+                        position++;
+                    }
+
+                    //find first non-white space
                     while (position < _currentPosition)  //don't go past the head
                     {
                         if (_buffer[position] != (byte)' ' && _buffer[position] != (byte)'\t')  //skip all white space
@@ -135,12 +186,12 @@ namespace SipCs.Buffer
             while (index < haystack.Length)
             {
                 var checkByte = haystack[index];
-                if (haystack[index] == lastByte)
+                if (CaseInsensitveUtf8Comapare(haystack[index], lastByte))
                 {
                     bool found = true;
                     for (int j = needle.Length - 2; j >= 0; j--)
                     {
-                        if (haystack[index - needle.Length + j + 1] != needle[j])
+                        if (!CaseInsensitveUtf8Comapare(haystack[index - needle.Length + j + 1], needle[j]))
                         {
                             found = false;
                             break;
@@ -158,6 +209,11 @@ namespace SipCs.Buffer
                 }
             }
             return -1;
+        }
+
+        static bool CaseInsensitveUtf8Comapare(byte left, byte right)
+        {
+            return Char.ToLower((char)left) == Char.ToLower((char)right);
         }
     }
 }

@@ -30,6 +30,35 @@ a=fmtp:101 0-16
 a=silenceSupp:off - - - -
 a=ptime:20
 a=sendrecv";
+
+        public const string InviteWithWeirdCaseForContentLength = @"INVITE sip:13@10.10.1.13 SIP/2.0
+Via: SIP/2.0/UDP 10.10.1.99:5060;branch=z9hG4bK343bf628;rport
+From: ""Test 15"" <sip:15@10.10.1.99>tag=as58f4201b
+To: <sip:13@10.10.1.13>
+Contact: <sip:15@10.10.1.99>
+Call-ID: 326371826c80e17e6cf6c29861eb2933@10.10.1.99
+CSeq: 102 INVITE
+User-Agent: Asterisk PBX
+Max-Forwards: 70
+Date: Wed, 06 Dec 2009 14:12:45 GMT
+Allow-Events: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY
+Supported: replaces
+Content-Type: application/sdp
+cOnTeNt-LEnGtH: 258
+
+v=0
+o=root 1821 1821 IN IP4 10.10.1.99
+s=session
+c = IN IP4 10.10.1.99
+t=0 0
+m=audio 11424 RTP/AVP 0 8 101
+a=rtpmap:0 PCMU/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-16
+a=silenceSupp:off - - - -
+a=ptime:20
+a=sendrecv";
     }
 
     //from:   https://stackoverflow.com/questions/1632499/problem-with-sip-bye-message
