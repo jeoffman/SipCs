@@ -184,15 +184,42 @@ namespace SipCs.Tests
             Assert.Equal(messageBytes, ret4);
         }
 
-        [Fact(Skip = "Buffer doesn't handle spaces between Content-Length and the colon : yet")]
-        public void BufferHandlesSpacesBeforeContentLengthColonTest()
+        [Theory]
+        [InlineData(Rfc4475TestMessages.AShortTortuousINVITE)]
+        //[InlineData(Rfc4475TestMessages.CrapAtTheEnd)]    this one appears to be 2 complete messages in one string - not exactly as invalid as my tests would have it
+        [InlineData(Rfc4475TestMessages.EscapedCharacters)]
+        [InlineData(Rfc4475TestMessages.EscapedNulls)]
+        [InlineData(Rfc4475TestMessages.LongValues)]
+        [InlineData(Rfc4475TestMessages.NoWhiteSpaces)]
+        [InlineData(Rfc4475TestMessages.ParametersInUriUserPart)]
+        [InlineData(Rfc4475TestMessages.PercentIsNotEscape)]
+        [InlineData(Rfc4475TestMessages.ValidCharacters)]
+        [InlineData(ExampleSipResponses.SimpleRinging)]
+        [InlineData(ExampleSipResponses.SimpleAck)]
+        [InlineData(ExampleSipResponses.SimpleBye)]
+        [InlineData(ExampleSipResponses.SimpleByeNoContentLength)]
+        [InlineData(ExampleSipRequests.SimpleInvite)]
+        public void BufferHandlesSpacesBeforeContentLengthColonTest(string message)
         {
             SipMessageBuffer buffer = new SipMessageBuffer();
-            byte[] messageBytes = Encoding.UTF8.GetBytes(Rfc4475TestMessages.AShortTortuousINVITE);
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             buffer.AddBytes(new ReadOnlySequence<byte>(messageBytes));
             var ret = buffer.GetCompletedMessage();
             Assert.NotNull(ret);
             Assert.Equal(messageBytes, ret);
         }
+
+        
+        [Fact]
+        public void HandleCaseInsensitiveContentLength()
+        {
+            SipMessageBuffer buffer = new SipMessageBuffer();
+
+            byte[] messageBytes = Encoding.UTF8.GetBytes(ExampleSipRequests.InviteWithWeirdCaseForContentLength);
+            buffer.AddBytes(new ReadOnlySequence<byte>(messageBytes));
+            var ret = buffer.GetCompletedMessage();
+            Assert.Equal(messageBytes, ret);
+        }
+
     }
 }
